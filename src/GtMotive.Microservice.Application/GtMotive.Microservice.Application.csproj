@@ -12,9 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Handlers\" />
     <Folder Include="Querys\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GtMotive.Microservice.Domain\GtMotive.Microservice.Domain.csproj" />
   </ItemGroup>
 
 </Project>
