@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GtMotive.Microservice.Domain.ValueObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,7 @@ public class Vehicle
     /// <summary>
     /// Manufacture date of the vehicle.
     /// </summary>
-    public DateTime ManufactureDate { get; init; }
+    public ManufactureDate ManufactureDate { get; init; }
 
     /// <summary>
     /// Is the vehicle currently rented?
@@ -39,7 +40,7 @@ public class Vehicle
     public string? RentedBy { get; private set; }
 
     /// <summary>
-    ///  Initializes a new instance of the <see cref="Vehicle"/> class.
+    ///  Initializes a new instance of the <see cref="Vehicle"/> class. EF
     /// </summary>
     public Vehicle()
     {
@@ -53,15 +54,12 @@ public class Vehicle
     /// <param name="model"></param>
     /// <param name="manufactureDate"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public Vehicle(string brand, string model, DateTime manufactureDate)
+    public Vehicle(string brand, string model, ManufactureDate manufactureDate)
     {
-        if (manufactureDate < DateTime.UtcNow.AddYears(-5))
-            throw new InvalidOperationException("Vehicles older than 5 years are not permitted.");
-
         Id = Guid.NewGuid().ToString();
         Brand = brand;
         Model = model;
-        ManufactureDate = manufactureDate;
+        ManufactureDate = manufactureDate; 
         IsRented = false;
     }
 
@@ -72,9 +70,6 @@ public class Vehicle
     /// <exception cref="InvalidOperationException"></exception>
     public void Rent(string personId)
     {
-        if (IsRented)
-            throw new InvalidOperationException("Vehicle is rented");
-
         IsRented = true;
         RentedBy = personId;
     }
@@ -84,10 +79,7 @@ public class Vehicle
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     public void Return()
-    {
-        if (!IsRented)
-            throw new InvalidOperationException("Vehicle is not rented");
-
+    {      
         IsRented = false;
         RentedBy = null;
     }
