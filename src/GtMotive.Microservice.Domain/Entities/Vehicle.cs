@@ -29,10 +29,66 @@ public class Vehicle
     public DateTime ManufactureDate { get; init; }
 
     /// <summary>
+    /// Is the vehicle currently rented?
+    /// </summary>
+    public bool IsRented { get; private set; }
+
+    /// <summary>
+    ///  Identifier of the person who rented the vehicle, if applicable.
+    /// </summary>
+    public string? RentedBy { get; private set; }
+
+    /// <summary>
     ///  Initializes a new instance of the <see cref="Vehicle"/> class.
     /// </summary>
     public Vehicle()
     {
 
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="brand"></param>
+    /// <param name="model"></param>
+    /// <param name="manufactureDate"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public Vehicle(string brand, string model, DateTime manufactureDate)
+    {
+        if (manufactureDate < DateTime.UtcNow.AddYears(-5))
+            throw new InvalidOperationException("Vehicles older than 5 years are not permitted.");
+
+        Id = Guid.NewGuid().ToString();
+        Brand = brand;
+        Model = model;
+        ManufactureDate = manufactureDate;
+        IsRented = false;
+    }
+
+    /// <summary>
+    /// Rents the vehicle to a person identified by <paramref name="personId"/>.
+    /// </summary>
+    /// <param name="personId"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void Rent(string personId)
+    {
+        if (IsRented)
+            throw new InvalidOperationException("Vehicle is rented");
+
+        IsRented = true;
+        RentedBy = personId;
+    }
+
+    /// <summary>
+    /// Returns the vehicle, making it available for rent again.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void Return()
+    {
+        if (!IsRented)
+            throw new InvalidOperationException("Vehicle is not rented");
+
+        IsRented = false;
+        RentedBy = null;
     }
 }
