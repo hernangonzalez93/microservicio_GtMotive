@@ -47,8 +47,7 @@ public class GetAllVehiclesQueryHandler : IRequestHandler<GetAllVehicleQuery, Re
 
         if (requestGet.Page < 1) return Result<PagedResult<VehicleResponse>>.Failure("Page should be >= 1.");
 
-        if (requestGet.PageSize < 1 || requestGet.PageSize > 100)
-            return Result<PagedResult<VehicleResponse>>.Failure("PageSize should be between 1 and 100.");
+        if (requestGet.PageSize < 1 || requestGet.PageSize > 50) return Result<PagedResult<VehicleResponse>>.Failure("PageSize should be between 1 and 50.");
 
         var requestDomain = _mapper.Map<GetAllVehicleRequestDomain>(requestGet);
 

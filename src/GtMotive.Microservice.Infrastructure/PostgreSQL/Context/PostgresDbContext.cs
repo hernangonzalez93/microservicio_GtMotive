@@ -18,6 +18,7 @@ public class PostgresDbContext : DbContext
     /// <param name="options">The options to be used by this DbContext.</param>
     public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     /// <summary>

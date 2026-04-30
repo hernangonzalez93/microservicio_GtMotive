@@ -14,11 +14,11 @@ public record GetAllVehicleRequest
 
     public string? ModelContains { get; set; } = null;
 
-    public bool? IsRented { get; set; } = false;
+    public bool? IsRented { get; set; } = null;
 
     public string? SortedBy { get; set; } = "Id";
 
-    public bool? Descending { get; set; } = false;
+    public bool? Descending { get; set; } = null;
 
     public int Page { get; set; } = 1;
 
