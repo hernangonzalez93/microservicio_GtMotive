@@ -1,4 +1,6 @@
 ﻿using GtMotive.Microservice.Domain.Entities;
+using GtMotive.Microservice.Domain.ValueObjects;
+using GtMotive.Microservice.Infrastructure.PostgreSQL.Settings;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,39 +31,9 @@ public class PostgresDbContext : DbContext
     /// <param name="modelBuilder">The model builder used to construct the model for the database.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
+        //base.OnModelCreating(modelBuilder);
 
-        // Configure Vehicle entity
-        modelBuilder.Entity<Vehicle>(entity =>
-        {
-            entity.HasKey(v => v.Id);
-
-            entity.Property(v => v.Id)
-                .HasColumnType("varchar(36)")
-                .IsRequired();
-
-            entity.Property(v => v.Brand)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-
-            entity.Property(v => v.Model)
-                .HasColumnType("varchar(100)")
-                .IsRequired();
-
-            entity.Property(v => v.ManufactureDate)
-                .HasColumnType("timestamp")
-                .IsRequired();
-
-            entity.Property(v => v.IsRented)
-                .HasColumnType("boolean")
-                .IsRequired()
-                .HasDefaultValue(false);
-
-            entity.Property(v => v.RentedBy)
-                .HasColumnType("varchar(255)")
-                .IsRequired(false);
-
-            entity.ToTable("vehicles");
-        });
+        modelBuilder.ApplyConfiguration(new VehicleConfiguration());
+        // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly()); // automatico
     }
 }

@@ -21,6 +21,16 @@ namespace GtMotive.Microservice.Domain.ValueObjects
             Value = value;
         }
 
+        // Constructor privado — sin validación, solo para reconstitución desde la BD
+        private ManufactureDate(DateTime value, bool fromPersistence)
+        {
+            Value = value;
+        }
+
+        // Factory method que EF usa internamente via la conversión
+        public static ManufactureDate FromPersistence(DateTime value)
+            => new ManufactureDate(value, fromPersistence: true);
+
         public static implicit operator DateTime(ManufactureDate date) => date.Value; // para no escribir .value cada vez que se use
 
         public override string ToString() => Value.ToString("yyyy-MM-dd");

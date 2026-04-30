@@ -6,4 +6,14 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="MediatR" Version="14.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GtMotive.Microservice.Application\GtMotive.Microservice.Application.csproj" />
+  </ItemGroup>
+
 </Project>
