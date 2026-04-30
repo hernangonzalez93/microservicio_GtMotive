@@ -1,4 +1,5 @@
 ﻿using GtMotive.Microservice.Domain.Entities;
+using GtMotive.Microservice.Domain.Filters;
 using GtMotive.Microservice.Domain.Ports;
 using GtMotive.Microservice.Infrastructure.PostgreSQL.Context;
 using Microsoft.EntityFrameworkCore;
@@ -32,7 +33,7 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// </summary>
     /// <param name="vehicle">The vehicle to add. Cannot be <see langword="null"/>.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task AddAsync(Vehicle vehicle)
+    public async Task AddAsync(Vehicle vehicle, CancellationToken ct = default)
     {
         _logger.LogInformation($"Adding vehicle with Id: {vehicle.Id}, Model: {vehicle.Model}, ManufactureDate: {vehicle.ManufactureDate}");
 
@@ -61,14 +62,42 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// The returned list will be empty if no vehicles are found.</remarks>
     /// <returns>A task representing the asynchronous operation. The task result contains a list of <see cref="Vehicle"/>
     /// objects representing all vehicles in the database.</returns>
-    public async Task<List<Vehicle>> ListAsync()
+    public async Task<List<Vehicle>> ListAsync(GetAllVehicleRequestDomain getAllVehicleRequest, CancellationToken ct = default)
     {
         _logger.LogInformation("Listing all vehicles.");
 
-        var vehicles = await _context.Vehicles.ToListAsync();
+        IQueryable<Vehicle> query = _context.Vehicles;
 
-        _logger.LogInformation($"Listing vehicles. Total count: {vehicles.Count}");
-        return vehicles;
+        if (!string.IsNullOrEmpty(getAllVehicleRequest.Id))
+        {
+            query = query.Where(v => v.Id.Contains(getAllVehicleRequest.Id));
+        }
+        if (!string.IsNullOrEmpty(getAllVehicleRequest.BrandContains))
+        {
+            query = query.Where(v => v.Brand.Contains(getAllVehicleRequest.BrandContains));
+        }
+        if (!string.IsNullOrEmpty(getAllVehicleRequest.ModelContains))
+        {
+            query = query.Where(v => v.Model.Contains(getAllVehicleRequest.ModelContains));
+        }
+        if (getAllVehicleRequest.IsRented.HasValue)
+        {
+            query = query.Where(v => v.IsRented == getAllVehicleRequest.IsRented.Value);
+        }
+        if (!string.IsNullOrEmpty(getAllVehicleRequest.SortedBy))
+        {
+            query = getAllVehicleRequest.Descending == true
+                ? query.OrderByDescending(v => EF.Property<object>(v, getAllVehicleRequest.SortedBy))
+                : query.OrderBy(v => EF.Property<object>(v, getAllVehicleRequest.SortedBy));
+        }
+       
+        var pagedVehicles = await query
+        .Skip((getAllVehicleRequest.Page - 1) * getAllVehicleRequest.PageSize)
+        .Take(getAllVehicleRequest.PageSize)
+        .ToListAsync(ct);
+
+        _logger.LogInformation($"Listing vehicles. Total count: {pagedVehicles.Count}");
+        return pagedVehicles;
     }
 
     /// <summary>

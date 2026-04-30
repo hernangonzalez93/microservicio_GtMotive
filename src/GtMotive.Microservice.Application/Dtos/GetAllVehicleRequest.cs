@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Dtos;
 
-public class GetAllVehicleRequest
+public record GetAllVehicleRequest
 {
     public string? Id { get; set; } = null;
 

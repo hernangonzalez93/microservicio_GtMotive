@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Dtos;
 
-public class CreateVehicleRequest
+public record CreateVehicleRequest
 {
     /// <summary>
     /// Gets or sets the brand name of the product.

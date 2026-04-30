@@ -38,7 +38,7 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
         _logger.LogInformation("Handling CreateVehicleCommand for Brand: {Brand}, Model: {Model}", request.Brand, request.Model);
 
         var vehicle = new Vehicle(request.Brand, request.Model, request.ManufactureDate);
-        await _repository.AddAsync(vehicle);
+        await _repository.AddAsync(vehicle, cancellationToken);
 
         _logger.LogInformation("Vehicle created successfully with ID: {VehicleId}", vehicle.Id);
         return vehicle.Id;

@@ -82,28 +82,19 @@ public class VehicleController : ControllerBase
     public async Task<IActionResult> GetAll(
         [FromQuery] GetAllVehicleRequest getAllVehicleRequest,
         CancellationToken ct
-        //[FromQuery] string? id = null,
-        //[FromQuery] string? brandContains = null,
-        //[FromQuery] string? modelContains = null,
-        //[FromQuery] bool? isRented = false,
-        //[FromQuery] string sortBy = "id",
-        //[FromQuery] bool descending = false,
-        //[FromQuery] int page = 1,
-        //[FromQuery] int pageSize = 10
         )
     {
         _logger.LogInformation("API: Getting all vehicles");
         try
         {
             // Create query
-             var query = new GetAllVehicleQuery(getAllVehicleRequest);
-            //var query = _mapper.Map<GetAllVehicleQuery>(getAllVehicleRequest);
+            var query = new GetAllVehicleQuery(getAllVehicleRequest);
 
             // Send query through MediatR
-            var vehicles = await _mediator.Send(query,ct);
+            var vehicles = await _mediator.Send(query, ct);
 
-            _logger.LogInformation("API: Retrieved {Count} vehicles", vehicles.Count);
-            return Ok(vehicles);
+            _logger.LogInformation("API: Retrieved {Count} vehicles", vehicles.Value);
+            return vehicles.IsSuccess ? Ok(vehicles.Value) : BadRequest(vehicles.Error);
         }
         catch (Exception ex)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Dtos;
 
-public class VehicleResponse
+public record VehicleResponse
 {
     /// <summary>
     /// Gets or sets the unique identifier of the vehicle.

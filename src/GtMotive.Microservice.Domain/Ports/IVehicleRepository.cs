@@ -1,4 +1,5 @@
 ﻿using GtMotive.Microservice.Domain.Entities;
+using GtMotive.Microservice.Domain.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ public interface IVehicleRepository
     /// </summary>
     /// <param name="vehicle"></param>
     /// <returns></returns>
-    Task AddAsync(Vehicle vehicle);
+    Task AddAsync(Vehicle vehicle, CancellationToken ct = default);
 
     /// <summary>
     /// GeT A Car by Id
@@ -27,7 +28,7 @@ public interface IVehicleRepository
     /// List all vehicles in the inventory
     /// </summary>
     /// <returns></returns>
-    Task<List<Vehicle>> ListAsync();
+    Task<List<Vehicle>> ListAsync(GetAllVehicleRequestDomain getAllVehicleRequestDomain, CancellationToken ct = default);
 
     /// <summary>
     /// Update a vehicle in the inventory

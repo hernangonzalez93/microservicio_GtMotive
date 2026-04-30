@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using GtMotive.Microservice.Application.Dtos;
+using GtMotive.Microservice.Application.Dtos.Pagination;
 using GtMotive.Microservice.Application.Querys;
+using GtMotive.Microservice.Domain.Filters;
 using GtMotive.Microservice.Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Handlers;
 
-public class GetAllVehiclesQueryHandler : IRequestHandler<GetAllVehicleQuery, List<VehicleResponse>>
+public class GetAllVehiclesQueryHandler : IRequestHandler<GetAllVehicleQuery, Result<PagedResult<VehicleResponse>>>
 {
     private readonly IVehicleRepository _repository;
     private readonly IMapper _mapper;
@@ -36,17 +38,29 @@ public class GetAllVehiclesQueryHandler : IRequestHandler<GetAllVehicleQuery, Li
     /// </summary>
     /// <param name="request">The GetAllVehiclesQuery.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>A list of VehicleResponse objects.</returns>
-    public async Task<List<VehicleResponse>> Handle(GetAllVehicleQuery request, CancellationToken cancellationToken)
+    /// <returns>A paged result of VehicleResponse objects.</returns>
+    public async Task<Result<PagedResult<VehicleResponse>>> Handle(GetAllVehicleQuery request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling GetAllVehicleQuery");
 
-        var f = request.GetAllVehicleFilter;
-        var vehicles = await _repository.ListAsync();
+        var requestGet = request.GetAllVehicleFilter;
+
+        if (requestGet.Page < 1) return Result<PagedResult<VehicleResponse>>.Failure("Page should be >= 1.");
+
+        if (requestGet.PageSize < 1 || requestGet.PageSize > 100)
+            return Result<PagedResult<VehicleResponse>>.Failure("PageSize should be between 1 and 100.");
+
+        var requestDomain = _mapper.Map<GetAllVehicleRequestDomain>(requestGet);
+
+        var vehicles = await _repository.ListAsync(requestDomain, cancellationToken);
+
         var vehicleResponses = _mapper.Map<List<VehicleResponse>>(vehicles);
 
         _logger.LogInformation("Retrieved {Count} vehicles", vehicleResponses.Count);
-        return vehicleResponses;
+
+        var pagedResult = new PagedResult<VehicleResponse>(vehicleResponses, vehicleResponses.Count, requestGet.Page, requestGet.PageSize);
+
+        return Result<PagedResult<VehicleResponse>>.Success(pagedResult);
     }
 
 }
