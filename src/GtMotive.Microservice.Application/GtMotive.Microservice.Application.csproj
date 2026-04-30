@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Querys\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GtMotive.Microservice.Domain\GtMotive.Microservice.Domain.csproj" />
   </ItemGroup>
 

@@ -63,7 +63,12 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// objects representing all vehicles in the database.</returns>
     public async Task<List<Vehicle>> ListAsync()
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Listing all vehicles.");
+
+        var vehicles = await _context.Vehicles.ToListAsync();
+
+        _logger.LogInformation($"Listing vehicles. Total count: {vehicles.Count}");
+        return vehicles;
     }
 
     /// <summary>

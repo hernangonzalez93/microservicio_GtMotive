@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GtMotive.Microservice.Application.Commands;
 using GtMotive.Microservice.Application.Dtos;
+using GtMotive.Microservice.Application.Querys;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -69,6 +70,44 @@ public class VehicleController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError("API: Error in Create Vehicle: {Exception}", ex.Message);
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Gets all vehicles available in the system.
+    /// </summary>
+    /// <returns>A 200 OK response with a list of vehicles.</returns>
+    [HttpGet]
+    public async Task<IActionResult> GetAll(
+        [FromQuery] GetAllVehicleRequest getAllVehicleRequest,
+        CancellationToken ct
+        //[FromQuery] string? id = null,
+        //[FromQuery] string? brandContains = null,
+        //[FromQuery] string? modelContains = null,
+        //[FromQuery] bool? isRented = false,
+        //[FromQuery] string sortBy = "id",
+        //[FromQuery] bool descending = false,
+        //[FromQuery] int page = 1,
+        //[FromQuery] int pageSize = 10
+        )
+    {
+        _logger.LogInformation("API: Getting all vehicles");
+        try
+        {
+            // Create query
+             var query = new GetAllVehicleQuery(getAllVehicleRequest);
+            //var query = _mapper.Map<GetAllVehicleQuery>(getAllVehicleRequest);
+
+            // Send query through MediatR
+            var vehicles = await _mediator.Send(query,ct);
+
+            _logger.LogInformation("API: Retrieved {Count} vehicles", vehicles.Count);
+            return Ok(vehicles);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("API: Error retrieving vehicles: {Exception}", ex.Message);
             return BadRequest(new { message = ex.Message });
         }
     }
