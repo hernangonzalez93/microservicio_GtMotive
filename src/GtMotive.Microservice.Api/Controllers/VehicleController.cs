@@ -3,6 +3,7 @@ using GtMotive.Microservice.Application.Commands;
 using GtMotive.Microservice.Application.Dtos;
 using GtMotive.Microservice.Application.Querys;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -60,10 +61,16 @@ public class VehicleController : ControllerBase
             var command = _mapper.Map<CreateVehicleCommand>(request);
 
             // Send command through MediatR
-            var id = await _mediator.Send(command, ct);
+            var result = await _mediator.Send(command, ct);
 
-            _logger.LogInformation("API: Vehicle created successfully with ID: {VehicleId}", id);
-            return CreatedAtAction(nameof(GetAll), new { id }, new { id });
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("API: Failed to create vehicle: {Error}", result.Error);
+                return BadRequest(new { message = result.Error });
+            }
+
+            _logger.LogInformation("API: Vehicle created successfully with ID: {VehicleId}", result.Value);
+            return CreatedAtAction(nameof(GetAll), new { id = result.Value }, new { id = result.Value });
         }
 
         catch (Exception ex)
@@ -89,7 +96,7 @@ public class VehicleController : ControllerBase
             // Create query
             var query = new GetAllVehicleQuery(getAllVehicleRequest);
 
-            // Send query through MediatR
+            // Send query
             var vehicles = await _mediator.Send(query, ct);
 
             _logger.LogInformation("API: Retrieved {Count} vehicles", vehicles.Value);
@@ -99,6 +106,103 @@ public class VehicleController : ControllerBase
         {
             _logger.LogError("API: Error retrieving vehicles: {Exception}", ex.Message);
             return BadRequest(new { message = ex.Message });
+        }
+    }
+
+
+    /// <summary>
+    /// Rents a vehicle to a person identified by their ID.
+    /// </summary>
+    /// <param name="vehicleId">The ID of the vehicle to rent.</param>
+    /// <param name="request">The request containing the person ID.</param>
+    /// <returns>A 200 OK response with the result of the rent operation.</returns>
+    [HttpPut("{vehicleId}/rent")]
+    public async Task<IActionResult> Rent(string vehicleId, [FromBody] RentVehicleRequest request, CancellationToken ct)
+    {
+        try
+        {
+            // Validate request model
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("API: Invalid model state");
+                return BadRequest(ModelState);
+            }
+
+            if (string.IsNullOrEmpty(vehicleId))
+            {
+                _logger.LogWarning("API: Vehicle ID is null or empty");
+                return BadRequest(new { message = "Vehicle ID is required" });
+            }
+
+            _logger.LogInformation("API: Renting vehicle {VehicleId} for person {PersonId}", vehicleId, request.PersonId);
+
+            // Create command
+            var command = new RentVehicleCommand(vehicleId, request.PersonId);
+
+            // Send command
+            var result = await _mediator.Send(command, ct);
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("API: Failed to rent vehicle {VehicleId}: {Error}", vehicleId, result.Error);
+                return BadRequest(new { message = result.Error });
+            }
+
+            _logger.LogInformation("API: Vehicle {VehicleId} rented successfully", vehicleId);
+            return Ok(result.Value);
+
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("API: Error renting vehicle: {Exception}", ex.Message);
+            return StatusCode(500, new { message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Returns a rented vehicle identified by its ID.
+    /// </summary>
+    /// <param name="vehicleId">The ID of the vehicle to return.</param>
+    /// <returns>A 204 No Content response on success.</returns>
+    [HttpPut("{vehicleId}/return")]
+    public async Task<IActionResult> Return(string vehicleId)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("API: Invalid model state");
+                return BadRequest(ModelState);
+            }
+            if (string.IsNullOrEmpty(vehicleId)) 
+            {
+                _logger.LogWarning("API: Vehicle ID is null or empty");
+                return BadRequest(new { message = "Vehicle ID is required" });
+            }
+
+            _logger.LogInformation("API: Returning vehicle {VehicleId}", vehicleId);
+
+            // Create command
+            var command = new ReturnVehicleCommand(vehicleId);
+
+            // Send command 
+            var result = await _mediator.Send(command);
+
+            _logger.LogInformation("API: Vehicle {VehicleId} returned successfully", vehicleId);
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("API: Failed to return vehicle {VehicleId}: {Error}", vehicleId, result.Error);
+                return BadRequest(new { message = result.Error });
+            }
+
+            _logger.LogInformation("API: Vehicle {VehicleId} returned successfully", vehicleId);
+            return Ok(result.Value);
+
+        }     
+        catch (Exception ex)
+        {
+            _logger.LogError("API: Error returning vehicle: {Exception}", ex.Message);
+            return StatusCode(500, new { message = ex.Message });
         }
     }
 }

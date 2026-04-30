@@ -16,7 +16,7 @@ public record GetAllVehicleRequest
 
     public bool? IsRented { get; set; } = null;
 
-    public string? SortedBy { get; set; } = "Id";
+    public string? SortedBy { get; set; } = "Brand";
 
     public bool? Descending { get; set; } = null;
 

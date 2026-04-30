@@ -1,4 +1,5 @@
 ﻿using GtMotive.Microservice.Application.Commands;
+using GtMotive.Microservice.Application.Dtos;
 using GtMotive.Microservice.Domain.Entities;
 using GtMotive.Microservice.Domain.Ports;
 using MediatR;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Handlers;
 
-public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand, string>
+public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand, Result<string>>
 {
     private readonly IVehicleRepository _repository;
     private readonly ILogger<CreateVehicleCommandHandler> _logger;
@@ -33,7 +34,7 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
     /// <param name="request">The CreateVehicleCommand containing the vehicle details.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The ID of the newly created vehicle.</returns>
-    public async Task<string> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
+    public async Task<Result<string>> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
     {
         _logger.LogInformation("Handling CreateVehicleCommand for Brand: {Brand}, Model: {Model}", request.Brand, request.Model);
 
@@ -41,6 +42,6 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
         await _repository.AddAsync(vehicle, cancellationToken);
 
         _logger.LogInformation("Vehicle created successfully with ID: {VehicleId}", vehicle.Id);
-        return vehicle.Id;
+        return Result<string>.Success($"Vehicle was successfully created with id {vehicle.Id}");
     }
 }

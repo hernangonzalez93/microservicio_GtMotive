@@ -1,4 +1,5 @@
-﻿using GtMotive.Microservice.Domain.ValueObjects;
+﻿using GtMotive.Microservice.Application.Dtos;
+using GtMotive.Microservice.Domain.ValueObjects;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Application.Commands;
 
-public record CreateVehicleCommand : IRequest<string>
+public record CreateVehicleCommand : IRequest<Result<string>>
 {
     /// <summary>
     /// Gets the brand of the vehicle to be created.

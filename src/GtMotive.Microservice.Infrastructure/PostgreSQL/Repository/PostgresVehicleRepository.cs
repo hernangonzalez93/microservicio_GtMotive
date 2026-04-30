@@ -35,12 +35,19 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task AddAsync(Vehicle vehicle, CancellationToken ct = default)
     {
-        _logger.LogInformation($"Adding vehicle with Id: {vehicle.Id}, Model: {vehicle.Model}, ManufactureDate: {vehicle.ManufactureDate}");
+        try
+        {
+            _logger.LogInformation($"Adding vehicle with Id: {vehicle.Id}, Model: {vehicle.Model}, ManufactureDate: {vehicle.ManufactureDate}");
 
-        _context.Vehicles.Add(vehicle);
-        await _context.SaveChangesAsync();
+            _context.Vehicles.Add(vehicle);
+            await _context.SaveChangesAsync();
 
-        _logger.LogInformation($"Vehicle with Id: {vehicle.Id} added successfully.");
+            _logger.LogInformation($"Vehicle with Id: {vehicle.Id} added successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Error adding vehicle with Id: {vehicle.Id}. Exception: {ex.Message}");        
+        }     
     }
 
     /// <summary>
@@ -51,8 +58,14 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// or <see langword="null"/> if no matching vehicle is found.</returns>
     public async Task<Vehicle?> GetByIdAsync(string id)
     {
-        
-        throw new NotImplementedException();
+
+        _logger.LogInformation($"Retrieving vehicle with Id: {id}");
+
+        var vehicle = await _context.Vehicles.FirstOrDefaultAsync(v => v.Id == id);
+
+        _logger.LogInformation($"Retrieving vehicle with Id: {id}. Found: {vehicle != null}");
+
+        return vehicle;
     }
 
     /// <summary>
@@ -110,7 +123,12 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// <returns>A task that represents the asynchronous update operation.</returns>
     public async Task UpdateAsync(Vehicle vehicle)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation($"Updating vehicle with Id: {vehicle.Id}, Model: {vehicle.Model}, ManufactureDate: {vehicle.ManufactureDate}");
+
+        _context.Vehicles.Update(vehicle);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Vehicle with Id: {vehicle.Id} updated successfully.");
     }
 
     /// <summary>
