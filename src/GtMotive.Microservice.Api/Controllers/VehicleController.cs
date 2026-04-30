@@ -63,8 +63,7 @@ public class VehicleController : ControllerBase
             var id = await _mediator.Send(command, ct);
 
             _logger.LogInformation("API: Vehicle created successfully with ID: {VehicleId}", id);
-            //return CreatedAtAction(nameof(GetAll), new { id }, new { id });
-            return Ok(id);
+            return CreatedAtAction(nameof(GetAll), new { id }, new { id });
         }
 
         catch (Exception ex)

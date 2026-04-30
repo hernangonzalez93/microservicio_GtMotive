@@ -1,6 +1,8 @@
 using GtMotive.Microservice.Api;
 using GtMotive.Microservice.Application;
 using GtMotive.Microservice.Infrastructure;
+using GtMotive.Microservice.Infrastructure.PostgreSQL.Context;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,12 @@ builder.Services.AddApplicationCore();
 builder.Services.AddVehicleApi();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PostgresDbContext>();
+    db.Database.Migrate(); // Aplica migraciones pendientes
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

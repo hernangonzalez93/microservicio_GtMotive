@@ -31,7 +31,7 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
         builder.Property(v => v.ManufactureDate)
             .HasConversion(vo => vo.Value, raw => ManufactureDate.FromPersistence(raw))
             .HasColumnName("ManufactureDate")
-            .HasColumnType("datetime2")
+            .HasColumnType("timestamp")
             .IsRequired();
 
         builder.Property(v => v.IsRented)
@@ -43,6 +43,6 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
             .HasColumnType("varchar(255)")
             .IsRequired(false);
 
-        builder.ToTable("vehicles");
+        builder.ToTable("vehicle");
     }
 }

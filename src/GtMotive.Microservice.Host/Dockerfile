@@ -5,7 +5,6 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
 
 # Esta fase se usa para compilar el proyecto de servicio
@@ -13,6 +12,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/GtMotive.Microservice.Host/GtMotive.Microservice.Host.csproj", "src/GtMotive.Microservice.Host/"]
+COPY ["src/GtMotive.Microservice.Api/GtMotive.Microservice.Api.csproj", "src/GtMotive.Microservice.Api/"]
+COPY ["src/GTMotive.Microservice.Application/GTMotive.Microservice.Application.csproj", "src/GTMotive.Microservice.Application/"]
+COPY ["src/GTMotive.Microservice.Domain/GTMotive.Microservice.Domain.csproj", "src/GTMotive.Microservice.Domain/"]
+COPY ["src/GTMotive.Microservice.Infrastructure/GTMotive.Microservice.Infrastructure.csproj", "src/GTMotive.Microservice.Infrastructure/"]
 RUN dotnet restore "./src/GtMotive.Microservice.Host/GtMotive.Microservice.Host.csproj"
 COPY . .
 WORKDIR "/src/src/GtMotive.Microservice.Host"
