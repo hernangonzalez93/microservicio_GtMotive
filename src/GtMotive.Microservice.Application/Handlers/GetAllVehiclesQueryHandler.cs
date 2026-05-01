@@ -55,9 +55,12 @@ public class GetAllVehiclesQueryHandler : IRequestHandler<GetAllVehicleQuery, Re
 
         var vehicleResponses = _mapper.Map<List<VehicleResponse>>(vehicles);
 
+        // Getting total count for pagination
+        var totalCount = await _repository.CountAsync(cancellationToken);
+
         _logger.LogInformation("Retrieved {Count} vehicles", vehicleResponses.Count);
 
-        var pagedResult = new PagedResult<VehicleResponse>(vehicleResponses, vehicleResponses.Count, requestGet.Page, requestGet.PageSize);
+        var pagedResult = new PagedResult<VehicleResponse>(vehicleResponses, totalCount, requestGet.Page, requestGet.PageSize);
 
         return Result<PagedResult<VehicleResponse>>.Success(pagedResult);
     }

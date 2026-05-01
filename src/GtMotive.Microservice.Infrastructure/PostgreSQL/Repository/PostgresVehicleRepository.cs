@@ -56,7 +56,7 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// <param name="id">The unique identifier of the vehicle to retrieve. Cannot be null or empty.</param>
     /// <returns>A <see cref="Vehicle"/> object representing the vehicle with the specified identifier,
     /// or <see langword="null"/> if no matching vehicle is found.</returns>
-    public async Task<Vehicle?> GetByIdAsync(string id)
+    public async Task<Vehicle?> GetByIdAsync(string id, CancellationToken ct = default)
     {
 
         _logger.LogInformation($"Retrieving vehicle with Id: {id}");
@@ -66,6 +66,22 @@ public class PostgresVehicleRepository : IVehicleRepository
         _logger.LogInformation($"Retrieving vehicle with Id: {id}. Found: {vehicle != null}");
 
         return vehicle;
+    }
+
+    /// <summary>
+    /// Asynchronously counts the total number of vehicles that match the specified filters.
+    /// </summary>
+    /// <param name="ct">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the total number of vehicles.</returns>
+    public async Task<int> CountAsync(CancellationToken ct = default)
+    {
+        _logger.LogInformation("Counting Total vehicles.");
+
+        IQueryable<Vehicle> query = _context.Vehicles;
+       
+        var count = await query.CountAsync(ct);
+        _logger.LogInformation($"Counted vehicles with filters. Total count: {count}");
+        return count;
     }
 
     /// <summary>
@@ -120,8 +136,9 @@ public class PostgresVehicleRepository : IVehicleRepository
     /// of the provided <paramref name="vehicle"/>. Ensure that the <paramref name="vehicle"/>
     /// object contains valid data before calling this method.</remarks>
     /// <param name="vehicle">The vehicle to update. The <see cref="Vehicle.Id"/> property must match an existing record in the database.</param>
+    /// <param name="ct">The cancellation token.</param>
     /// <returns>A task that represents the asynchronous update operation.</returns>
-    public async Task UpdateAsync(Vehicle vehicle)
+    public async Task UpdateAsync(Vehicle vehicle, CancellationToken ct = default)
     {
         _logger.LogInformation($"Updating vehicle with Id: {vehicle.Id}, Model: {vehicle.Model}, ManufactureDate: {vehicle.ManufactureDate}");
 

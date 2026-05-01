@@ -1,4 +1,5 @@
-﻿using GtMotive.Microservice.Application.Dtos;
+﻿using GtMotive.Microservice.Application.Commands;
+using GtMotive.Microservice.Application.Dtos;
 using GtMotive.Microservice.Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GtMotive.Microservice.Application.Commands;
+namespace GtMotive.Microservice.Application.Handlers;
 
 public class ReturnVehicleCommandHandler : IRequestHandler<ReturnVehicleCommand, Result<string>>
 {
@@ -36,8 +37,7 @@ public class ReturnVehicleCommandHandler : IRequestHandler<ReturnVehicleCommand,
     {
         _logger.LogInformation("Handling ReturnVehicleCommand for Vehicle: {VehicleId}", request.VehicleId);
 
-        var vehicle = await _repository.GetByIdAsync(request.VehicleId);
-
+        var vehicle = await _repository.GetByIdAsync(request.VehicleId, cancellationToken);
         if (vehicle == null)
         {
             _logger.LogWarning("Vehicle not found with ID: {VehicleId}", request.VehicleId);

@@ -22,7 +22,7 @@ public interface IVehicleRepository
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<Vehicle?> GetByIdAsync(string id);
+    Task<Vehicle?> GetByIdAsync(string id, CancellationToken ct = default);
 
     /// <summary>
     /// List all vehicles in the inventory
@@ -35,7 +35,14 @@ public interface IVehicleRepository
     /// </summary>
     /// <param name="vehicle"></param>
     /// <returns></returns>
-    Task UpdateAsync(Vehicle vehicle);
+    Task UpdateAsync(Vehicle vehicle, CancellationToken ct = default);
+
+    /// <summary>
+    /// Asynchronously counts the total number of vehicles that match the specified filters.
+    /// </summary>
+    /// <param name="ct">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the total number of vehicles.</returns>
+    Task<int> CountAsync( CancellationToken ct = default);
 
     /// <summary>
     /// Determines whether the specified person has rented a vehicle.

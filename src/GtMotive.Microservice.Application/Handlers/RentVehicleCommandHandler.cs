@@ -42,7 +42,7 @@ public class RentVehicleCommandHandler : IRequestHandler<RentVehicleCommand, Res
         if (await _repository.HasPersonRentedVehicleAsync(request.PersonId))
             return Result<string>.Failure("Person already has vehicle rented");
  
-        var vehicle = await _repository.GetByIdAsync(request.VehicleId);
+        var vehicle = await _repository.GetByIdAsync(request.VehicleId, cancellationToken);
 
         if (vehicle == null)
         {

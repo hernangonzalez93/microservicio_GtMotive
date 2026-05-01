@@ -165,7 +165,7 @@ public class VehicleController : ControllerBase
     /// <param name="vehicleId">The ID of the vehicle to return.</param>
     /// <returns>A 204 No Content response on success.</returns>
     [HttpPut("{vehicleId}/return")]
-    public async Task<IActionResult> Return(string vehicleId)
+    public async Task<IActionResult> Return(string vehicleId, CancellationToken ct)
     {
         try
         {
@@ -186,7 +186,7 @@ public class VehicleController : ControllerBase
             var command = new ReturnVehicleCommand(vehicleId);
 
             // Send command 
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(command,ct);
 
             _logger.LogInformation("API: Vehicle {VehicleId} returned successfully", vehicleId);
             if (!result.IsSuccess)
