@@ -13,9 +13,9 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/GtMotive.Microservice.Host/GtMotive.Microservice.Host.csproj", "src/GtMotive.Microservice.Host/"]
 COPY ["src/GtMotive.Microservice.Api/GtMotive.Microservice.Api.csproj", "src/GtMotive.Microservice.Api/"]
-COPY ["src/GTMotive.Microservice.Application/GTMotive.Microservice.Application.csproj", "src/GTMotive.Microservice.Application/"]
-COPY ["src/GTMotive.Microservice.Domain/GTMotive.Microservice.Domain.csproj", "src/GTMotive.Microservice.Domain/"]
-COPY ["src/GTMotive.Microservice.Infrastructure/GTMotive.Microservice.Infrastructure.csproj", "src/GTMotive.Microservice.Infrastructure/"]
+COPY ["src/GtMotive.Microservice.Application/GtMotive.Microservice.Application.csproj", "src/GtMotive.Microservice.Application/"]
+COPY ["src/GtMotive.Microservice.Domain/GtMotive.Microservice.Domain.csproj", "src/GtMotive.Microservice.Domain/"]
+COPY ["src/GtMotive.Microservice.Infrastructure/GtMotive.Microservice.Infrastructure.csproj", "src/GtMotive.Microservice.Infrastructure/"]
 RUN dotnet restore "./src/GtMotive.Microservice.Host/GtMotive.Microservice.Host.csproj"
 COPY . .
 WORKDIR "/src/src/GtMotive.Microservice.Host"

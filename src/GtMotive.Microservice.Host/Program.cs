@@ -29,10 +29,11 @@ if (!app.Environment.IsEnvironment("Testing"))
         try
         {
             db.Database.Migrate(); // Aplica migraciones pendientes
+            Console.WriteLine("Migrations applied successfully.");
         }
         catch
         {
-            // Log migration errors but don't fail startup
+            Console.WriteLine("Error applying database migrations. Please check the database connection and migration scripts.");
         }
     }
 }
