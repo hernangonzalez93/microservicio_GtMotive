@@ -1,6 +1,7 @@
 ﻿using GtMotive.Microservice.Application.Commands;
 using GtMotive.Microservice.Application.Dtos;
 using GtMotive.Microservice.Application.Dtos.Pagination;
+using GtMotive.Microservice.Domain.DomainServices;
 using GtMotive.Microservice.Domain.Ports;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,7 @@ namespace GtMotive.Microservice.Application.Handlers;
 public class RentVehicleCommandHandler : IRequestHandler<RentVehicleCommand, Result<string>>
 {
     private readonly IVehicleRepository _repository;
+    private readonly IVehicleDomainService _vehicleDomainService;
     private readonly ILogger<RentVehicleCommandHandler> _logger;
 
     /// <summary>
@@ -22,9 +24,10 @@ public class RentVehicleCommandHandler : IRequestHandler<RentVehicleCommand, Res
     /// </summary>
     /// <param name="repository">The vehicle repository used for data operations.</param>
     /// <param name="logger">The logger instance for logging operations.</param>
-    public RentVehicleCommandHandler(IVehicleRepository repository, ILogger<RentVehicleCommandHandler> logger)
+    public RentVehicleCommandHandler(IVehicleRepository repository, IVehicleDomainService vehicleDomainService , ILogger<RentVehicleCommandHandler> logger)
     {
         _repository = repository;
+        _vehicleDomainService = vehicleDomainService;
         _logger = logger;
     }
 
@@ -50,10 +53,11 @@ public class RentVehicleCommandHandler : IRequestHandler<RentVehicleCommand, Res
             return Result<string>.Failure($"Vehicle with ID {request.VehicleId} not found");
         }
 
-        if (vehicle.IsRented)
+        var resultValidation = _vehicleDomainService.ValidateRent(vehicle);
+        if (!string.IsNullOrEmpty(resultValidation))
         {
-            _logger.LogWarning("Vehicle {VehicleId} is already rented", request.VehicleId);
-            return Result<string>.Failure($"Vehicle is already rented by {vehicle.RentedBy}");
+            _logger.LogWarning("Vehicle {VehicleId} cannot be rented: {Reason}", request.VehicleId, resultValidation);
+            return Result<string>.Failure(resultValidation);
         }
 
         vehicle.Rent(request.PersonId);

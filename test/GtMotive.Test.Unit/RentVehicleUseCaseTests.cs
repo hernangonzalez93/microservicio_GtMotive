@@ -1,5 +1,6 @@
 ﻿using GtMotive.Microservice.Application.Commands;
 using GtMotive.Microservice.Application.Handlers;
+using GtMotive.Microservice.Domain.DomainServices;
 using GtMotive.Microservice.Domain.Ports;
 using Moq;
 using System;
@@ -17,9 +18,10 @@ public class RentVehicleUseCaseTests
     {
         // Arrange
         var repositoryMock = new Mock<IVehicleRepository>();
+        var vehicleDomainServiceMock = new Mock<IVehicleDomainService>();
         // repositoryMock.Setup(r => r.HasPersonRentedVehicleAsync(It.IsAny<string>())).ReturnsAsync(true);
         repositoryMock.Setup(r => r.HasPersonRentedVehicleAsync("63214789H")).ReturnsAsync(true);
-        var handler = new RentVehicleCommandHandler(repositoryMock.Object, Mock.Of<Microsoft.Extensions.Logging.ILogger<RentVehicleCommandHandler>>());
+        var handler = new RentVehicleCommandHandler(repositoryMock.Object, vehicleDomainServiceMock.Object, Mock.Of<Microsoft.Extensions.Logging.ILogger<RentVehicleCommandHandler>>());
         var command = new RentVehicleCommand("913f36ea-c52c-4566-a6a9-4d3613f3dda3", "63214789H");
         // Act
         var result = await handler.Handle(command, CancellationToken.None);

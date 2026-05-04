@@ -9,25 +9,25 @@ using System.Threading.Tasks;
 
 namespace GtMotive.Microservice.Domain.DomainServices;
 
-public class VehicleDomainService
+public class VehicleDomainService : IVehicleDomainService
 {
     
     /// <summary>
     /// Validates that the specified vehicle is available for rent.
     /// </summary>
     /// <param name="vehicle">The vehicle to check for rental availability.</param>
-    public void ValidateRent(Vehicle vehicle)
+    public string ValidateRent(Vehicle vehicle)
     {
-        CheckRule(new VehicleMustBeAvailableRule(vehicle.IsRented));
+        return CheckRule(new VehicleMustBeAvailableRule(vehicle.IsRented));
     }
 
     /// <summary>
     /// Validates a vehicle can be returned, ensuring it is currently rented before allowing the return process to proceed.
     /// </summary>
     /// <param name="vehicle"></param>
-    public void ValidateReturn(Vehicle vehicle)
+    public string ValidateReturn(Vehicle vehicle)
     {
-        CheckRule(new VehicleMustBeRentedRule(vehicle.IsRented));
+        return CheckRule(new VehicleMustBeRentedRule(vehicle.IsRented));
     }
 
     /// <summary>
@@ -35,9 +35,10 @@ public class VehicleDomainService
     /// </summary>
     /// <param name="rule"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    private static void CheckRule(IDomainRule rule)
+    private string CheckRule(IDomainRule rule)
     {
         if (!rule.IsSatisfied())
-            throw new InvalidOperationException(rule.ErrorMessage);
+            return rule.ErrorMessage;
+        return string.Empty;
     }
 }
